@@ -1,6 +1,6 @@
 from typing import List
 from fastapi import FastAPI, HTTPException
-from schema import ToDoCreate, ToDoUpdate, ToDoResponse, ToDoUncompleted
+from schema import ToDoCreate, ToDoUpdate, ToDoResponse
 from database.base import session
 from database.todo import ToDo
 
@@ -60,12 +60,11 @@ async def get_completed_tasks():
     return completed_tasks
 
 @app.put("/todos/{todo_id}/uncompleted/", response_model=ToDoResponse)
-def update_todo(todo_id: int, todo: ToDoUncompleted):
+def update_todo(todo_id: int):
     todo_obj = session.query(ToDo).filter(ToDo.id == todo_id).first()
     if not todo_obj:
         raise HTTPException(status_code=404, detail="Task not found")
-    for key, value in todo.dict().items():
-        setattr(todo_obj, key, value)
+    task = session.query(ToDo).get(todo_id)
+    task.completed = False
     session.commit()
-    session.refresh(todo_obj)
-    return todo_obj
+    return task

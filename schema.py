@@ -24,5 +24,3 @@ class ToDoResponse(ToDoBase):
 
 
 
-class ToDoUncompleted(BaseModel):
-    completed: bool
